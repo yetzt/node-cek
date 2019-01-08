@@ -20,7 +20,7 @@ result is an object which consists of
 
 | property | present | explanation
 | --- | --- | --- 
-| `success` | always | true if webserver replied with http status code <200
+| `success` | always | true if webserver replied with http status code <400
 | `status` | on http(s) response | http status code
 | `err` | on error | any error passed from [request](https://www.npmjs.com/package/request)
 | `type` | if not successful | type of problem (`connection`,`dns`,`tls`,`protocol`,`error`,`webserver`,`backend`)
