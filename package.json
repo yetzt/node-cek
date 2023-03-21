@@ -1,11 +1,11 @@
 {
   "name": "cek",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "simple http(s) check",
   "main": "index.js",
   "author": "yetzt <node@yetzt.me>",
   "license": "Unlicense",
   "dependencies": {
-    "request": "^2.88.2"
+    "needle": "^3.2.0"
   }
 }

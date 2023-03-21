@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var request = require("request");
+var needle = require("needle");
 
 var http_status = {
 	"400": "Bad Request",
@@ -50,14 +50,14 @@ module.exports = function(u,fn){
 	var result = {
 		success: false, // assume there is a problem until there is no problem
 	};
-	
-	request.head(u, {
+
+	needle.head(u, {
 		timeout: 3000,
 	}, function(err, resp, data){
 
 		// remember if site ist https
-		result.https = (this.uri.protocol === 'https:');
-				
+		result.https = (resp.req.protocol === 'https:');
+
 		// try to calculate certificate validity
 		if (result.https) try {
 			result.certvalid = Math.round((new Date(this.req.connection.getPeerCertificate().valid_to).valueOf()-Date.now())/8.64e7);
@@ -65,7 +65,7 @@ module.exports = function(u,fn){
 			result.certvalid = false;
 		}
 
-		if (err) { 
+		if (err) {
 
 			result.err = err;
 
@@ -76,43 +76,43 @@ module.exports = function(u,fn){
 				case "ECONNABORTED":
 				case "EHOSTDOWN":
 				case "EHOSTUNREACH":
-					result.explain = "No connection to server"; 
+					result.explain = "No connection to server";
 					result.type = "connection";
 				break;
 				case "ECONNREFUSED":
-					result.explain = "Server refused connection"; 
+					result.explain = "Server refused connection";
 					result.type = "connection";
 				break;
 				case "ENOTFOUND":
-					result.explain = "Domain does not exist"; 
+					result.explain = "Domain does not exist";
 					result.type = "dns";
 				break;
-				case "CERT_HAS_EXPIRED": 
-					result.explain = "Certificate has expired"; 
+				case "CERT_HAS_EXPIRED":
+					result.explain = "Certificate has expired";
 					result.type = "tls";
 				break;
 				case "ERR_TLS_CERT_ALTNAME_INVALID":
 				case "DEPTH_ZERO_SELF_SIGNED_CERT":
 				case "UNABLE_TO_VERIFY_LEAF_SIGNATURE":
-					result.explain = "Certificate is not valid"; 
+					result.explain = "Certificate is not valid";
 					result.type = "tls";
 				break;
 				case "EPROTO":
 				case "HPE_INVALID_CONSTANT":
-					result.explain = "Wrong protocol between client and server"; 
+					result.explain = "Wrong protocol between client and server";
 					result.type = "protocol";
 				break;
 				default:
-					result.explain = "Error: "+err.code+" - "+err.toString(); 
+					result.explain = "Error: "+err.code+" - "+err.toString();
 					result.type = "error";
 				break;
 			}
-			
+
 		} else {
-			
+
 			result.status = resp.statusCode;
 			// result.response = resp.toJSON();
-				
+
 			if (resp.statusCode < 400) {
 				result.success = true;
 			} else if (!!http_status[resp.statusCode.toString()]) {
@@ -133,12 +133,11 @@ module.exports = function(u,fn){
 				result.type = "protocol";
 				result.explain = "The server sent an invalid status code: "+resp.statusCode;
 			}
-		
+
 		}
-		
+
 		return fn(result);
 
 	});
 	return;
 };
-
